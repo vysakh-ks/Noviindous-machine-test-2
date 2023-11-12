@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<!--app-content open-->
+<div class="main-content app-content mt-0">
+    <div class="side-app">
+
+        <!-- CONTAINER -->
+        <div class="main-container container-fluid">
+
+            <!-- PAGE-HEADER -->
+            <div class="page-header">
+                <h1 class="page-title">Short Term Course View</h1>
+                <a href="/add_course/" class="btn btn-danger btn-pill">Add <i class="fa fa-plus"></i></a>
+
+            </div>
+            <!-- PAGE-HEADER END -->
+
+
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card">
+                        <div class="card-header display-flex justify-content-between">
+                            <h3 class="card-title">Short Term Course Table</h3>
+                            <div class=" d-flex justify-content-between">
+            
+                                <form class="d-flex" action="{% url "core:search"  %}" method="POST">
+                                    {% csrf_token %}
+                                  <input class="form-control me-2 w-100" name="key" type="search" placeholder="Search..." aria-label="Search">
+                                  <button class="btn btn-outline-success" type="submit"><i class="side-menu__icon fe fe-search text-white"></i></button>
+                                </form>
+                              </div>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+                                <div class="table-responsive">
+                                    <table class="table border text-nowrap text-md-nowrap table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No</th>
+                                                <th>Image</th>
+                                                <th>Title</th>
+                                                <th>Subtitle</th>
+                                                <th>Description</th>
+                                                <th>Details</th>
+
+
+
+                                                <th>Satus</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for courses in course %}
+                                            <!-- TABLE DETAILS -->
+                                            <tr>
+                                                <td>1</td>
+                                                <td>
+                                                    <img class="d-block img-fluid br-5 img-td"
+                                                        src="{{courses.image.url}}" alt="">
+                                                </td>
+                                                <td> {{courses.title}}</td>
+                                                <td>
+                                                    {{courses.subtitle}}
+                                                </td>
+
+                                                <td><a class="btn btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#description" onclick="handleDescription('{{ courses.description }}')">
+                                                        <i class="side-menu__icon fe fe-eye text-white"></i>
+                                                    </a>
+                                                </td>
+                                                <td><a class="btn btn-dark" data-bs-toggle="modal"
+                                                        data-bs-target="#crsdetail" onclick="handleList('{{ courses.title }}','{{ courses.description }}')">
+                                                        <i class="side-menu__icon fe fe-list text-white"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {% if  courses.status == False %}
+                                                    <a href="{% url 'core:course_active' courses.id %}"><button class="btn btn-success">Make Active</button></a>
+                                                    
+                                                    {% else %}
+                                                    <a href="{% url 'core:course_inactive' courses.id %}"> <button class="btn btn-danger">Make Inactive</button></a>
+                                                    {% endif %}
+                                                    
+                                                   
+                                                </td>
+                                                <td>
+                                                    <a class=" btn btn-info" href="{% url 'core:edit_course' courses.id %}">
+                                                        <i class="side-menu__icon fe fe-edit"></i>
+                                                    </a>
+
+                                                    <a class="btn btn-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#modaldemo5" onclick="handleTrash('{{ courses.id }}')">
+                                                        <i class="side-menu__icon fe fe-trash text-white"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <!-- TABLE DETAILS END -->
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <div class="card-body">
+                                   {% if course.has_other_pages %}
+                                    <ul class="pagination">
+                                        {% if course.has_previous %}
+                                        <li class="page-item page-prev">
+                                            <a class="page-link" href="?page={{course.previous_page_number}}" tabindex="-1">Prev</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item page-prev disabled">
+                                            <a class="page-link" href="#" tabindex="-1">Prev</a>
+                                        </li>
+                                        {% endif %}
+                                        {% for i in course.paginator.page_range %}
+                                        {% if course.number == i %}
+                                        <li class="page-item active"><a class="page-link" href="">{{i}}</a></li>
+                                        {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        {% if course.has_next %}
+                                        <li class="page-item page-next">
+                                            <a class="page-link" href="?page={{course.next_page_number}}">Next</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item page-next disabled">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                {% endif %} 
+                                    <!-- pagination-wrapper -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <!-- CONTAINER END -->
+        </div>
+    </div>
+    <!--app-content close-->
+
+
+
+    <div class="modal  fade" id="modaldemo5" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md modal-dialog-centered text-center" role="document">
+            <div class="modal-content ">
+
+                <div class="modal-body">
+                    <button aria-label="Close" class="btn-close position-absolute" data-bs-dismiss="modal"><span
+                            aria-hidden="true">&times;</span></button>
+                    <i class="icon icon-close fs-70 text-danger lh-1 my-5 d-inline-block"></i>
+                    <h4 class="text-danger">Are You Sure Do You Want To Delete ?</h4>
+                    <p class="mg-b-20 mg-x-20">Item Will be Deleted Permanently</p>
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-success"><a id="deleteCourse">Yes</a></button>
+                    <button aria-label="Close" class="btn btn-danger pd-x-25" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MESSAGE MODAL -->
+    <div class="modal  fade" id="description" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md modal-dialog-centered text-center" role="document">
+            <div class="modal-content ">
+
+                <div class="modal-body">
+                    <button aria-label="Close" class="btn-close position-absolute" data-bs-dismiss="modal"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="text-primary">Description</h4>
+                    <!-- <p class="mg-b-20 mg-x-20">{{courses.description}}</p> -->
+                    <p class="mg-b-20 mg-x-20" id="descriptionContent"></p>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Detail  MODAL -->
+    <div class="modal  fade" id="crsdetail" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered text-center" role="document">
+            <div class="modal-content ">
+
+                <div class="modal-body">
+                    <button aria-label="Close" class="btn-close position-absolute" data-bs-dismiss="modal"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td  id="listTitle">{{courses.title}}</td>
+                                <td  id="listDescription">{{courses.description}}</td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer justify-content-center">
+
+                    <button aria-label="Close" class="btn btn-danger pd-x-25" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+  
+    function handleDescription(value){
+        var myParagraphElement = document.getElementById('descriptionContent');
+        myParagraphElement.innerHTML = value;
+    }
+
+    function handleList(title,desc){
+        $('#listTitle').text(title);
+        var listDescriptionElement = document.getElementById('listDescription');
+        listDescriptionElement.innerHTML = desc;
+    }
+
+    function handleTrash(id){
+        console.log(id,"handleTrash");
+        if(id){
+
+            var deleteCourseLink = document.getElementById('deleteCourse');
+            deleteCourseLink.href ='/delete_course/' + id + '/';
+        }
+    }
+
+
+    
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('searchInput');
+        var searchResults = document.getElementById('searchResults');
+        
+        searchInput.addEventListener('input', function() {
+            var query = this.value.trim();
+
+
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/search/' + query+ '/', true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data)
+                }
+            };
+
+            xhr.send();
+        });
+    });
+    
+</script>
+
+    {% endblock content %}
